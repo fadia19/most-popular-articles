@@ -1,26 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import "./App.css";
+import ArticlesListing from "./components/ArticlesListing";
+import { IArticle } from "./models/articles.model";
+import { fetchArticles } from "./utils/helpers";
 
-function App() {
+const App = () => {
+  const [articles, setArticles] = useState<IArticle[]>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const response = await fetchArticles().then((data) => {
+        return data;
+      });
+      setArticles(
+        response?.results?.map((item: IArticle) => ({
+          ...item,
+          showDetails: false,
+        }))
+      );
+      setIsLoading(false);
+    })();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <ArticlesListing isLoading={isLoading} articles={articles} />
     </div>
   );
-}
+};
 
 export default App;
